@@ -3,8 +3,8 @@ package net.morher.house.wled.frontend;
 import io.javalin.http.ContentType;
 import io.javalin.http.Context;
 import java.io.InputStream;
-import net.morher.house.wled.LedStripState;
 import net.morher.house.wled.WledControllerImpl;
+import net.morher.house.wled.style.LedStripState;
 import org.jetbrains.annotations.NotNull;
 
 public class DeviceHandler {

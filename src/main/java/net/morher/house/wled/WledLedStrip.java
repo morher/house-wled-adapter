@@ -1,48 +1,42 @@
 package net.morher.house.wled;
 
-import static java.util.stream.Collectors.toList;
-import java.util.List;
+import net.morher.house.api.devicetypes.LampDevice;
+import net.morher.house.api.entity.Device;
 import net.morher.house.api.entity.DeviceId;
 import net.morher.house.api.entity.DeviceInfo;
 import net.morher.house.api.entity.light.LightEntity;
-import net.morher.house.api.entity.light.LightOptions;
-import net.morher.house.api.entity.light.LightState;
-import net.morher.house.api.entity.light.LightState.PowerState;
-import net.morher.house.api.entity.light.LightStateHandler;
-import net.morher.house.wled.presets.Preset;
-import net.morher.house.wled.presets.PresetManager;
+import net.morher.house.api.utils.ResourceManager;
+import net.morher.house.wled.presets.EffectManager;
+import net.morher.house.wled.strip.LedStripDevice;
+import net.morher.house.wled.style.LedStripState;
 
 public class WledLedStrip {
-  private static final String CUSTOM_PRESET = "Custom";
+  private final ResourceManager resources = new ResourceManager();
   private final String id;
-  private final DeviceId deviceId;
+  private final Device device;
   private final WledNode node;
   private final int segmentId;
-  private final LightStateHandler handler;
-  private final PresetManager presets;
-  private LedStripState state = new LedStripState();
+  private final LedStripDevice stripDevice;
 
   public WledLedStrip(
-      String id,
-      DeviceId deviceId,
-      WledNode node,
-      int segmentId,
-      LightEntity lightEntity,
-      PresetManager presets) {
+      String id, Device device, WledNode node, int segmentId, EffectManager presets) {
 
     this.id = id;
-    this.deviceId = deviceId;
+    this.device = device;
     this.node = node;
     this.segmentId = segmentId;
-    this.presets = presets;
 
     DeviceInfo deviceInfo = new DeviceInfo();
     deviceInfo.setManufacturer("Wled");
-    this.handler = new LightStateHandler(lightEntity, deviceInfo, this::onLampState);
-    List<String> effects =
-        presets.getLedStripPresets(id).stream().map(Preset::getName).collect(toList());
-    effects.add(CUSTOM_PRESET);
-    handler.updateOptions(new LightOptions(true, effects));
+    device.setDeviceInfo(deviceInfo);
+
+    LightEntity lightEntity = device.entity(LampDevice.LIGHT);
+
+    this.stripDevice = new LedStripDevice(this::onLedStripStateUpdate, lightEntity, presets);
+  }
+
+  public void onLedStripStateUpdate(LedStripState state) {
+    node.updateSegment(segmentId, state);
   }
 
   public String getId() {
@@ -50,42 +44,14 @@ public class WledLedStrip {
   }
 
   public DeviceId getDeviceId() {
-    return deviceId;
-  }
-
-  public void onLampState(LightState updatedState) {
-    if (updatedState.getState() != null) {
-      state.setPowerOn(PowerState.ON.equals(updatedState.getState()));
-    }
-    if (updatedState.getBrightness() != null) {
-      state.setBrightness(updatedState.getBrightness());
-    }
-    if (CUSTOM_PRESET.equals(updatedState.getEffect())) {
-      state.apply(state, false);
-    } else {
-      Preset preset = getPreset(updatedState.getEffect());
-      if (preset != null) {
-        state.apply(preset.getState(), true);
-      }
-    }
-    node.updateSegment(segmentId, state);
+    return device.getId();
   }
 
   public LedStripState getState() {
-    return state;
+    return stripDevice.getState();
   }
 
   public void setState(LedStripState state) {
-    this.state = state;
-    node.updateSegment(segmentId, state);
-  }
-
-  private Preset getPreset(String presetId) {
-    for (Preset preset : presets.getLedStripPresets(id)) {
-      if (preset.getName().equals(presetId)) {
-        return preset;
-      }
-    }
-    return null;
+    stripDevice.updateCustomStyle(state);
   }
 }

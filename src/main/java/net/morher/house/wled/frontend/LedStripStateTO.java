@@ -1,7 +1,7 @@
 package net.morher.house.wled.frontend;
 
 import net.morher.house.api.utils.color.Color;
-import net.morher.house.wled.LedStripState;
+import net.morher.house.wled.style.LedStripState;
 
 public class LedStripStateTO {
   public Boolean powerOn;

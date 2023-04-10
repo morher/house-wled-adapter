@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
 import net.morher.house.api.mqtt.client.Topic;
 import net.morher.house.api.utils.color.Color;
+import net.morher.house.wled.style.LedStripState;
 import net.morher.house.wled.to.WledNodeState;
 import net.morher.house.wled.to.WledSegment;
 

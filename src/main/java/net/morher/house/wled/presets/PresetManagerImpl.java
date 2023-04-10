@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import net.morher.house.api.utils.color.Color;
-import net.morher.house.wled.LedStripState;
 import net.morher.house.wled.config.WledConfiguration.WledPresetConfig;
 import net.morher.house.wled.config.WledConfiguration.WledPresetStateConfig;
+import net.morher.house.wled.style.LedStripState;
 
-public class PresetManagerImpl implements PresetManager {
+public class PresetManagerImpl implements EffectManager {
   private List<Preset> presets = new ArrayList<>();
 
   public PresetManagerImpl() {}
@@ -41,7 +41,7 @@ public class PresetManagerImpl implements PresetManager {
   }
 
   @Override
-  public List<Preset> getLedStripPresets(String stripId) {
+  public List<Preset> getLedStripPresets() {
     return presets;
   }
 }
