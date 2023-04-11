@@ -10,6 +10,7 @@ import io.javalin.http.staticfiles.StaticFileConfig;
 import io.javalin.plugin.json.JavalinJackson;
 import java.io.InputStream;
 import net.morher.house.wled.WledControllerImpl;
+import net.morher.house.wled.frontend.auth.Role;
 import net.morher.house.wled.frontend.auth.UserManager;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,12 +28,13 @@ public class WledFrontendServer {
 
   public void run() {
     Javalin app = Javalin.create(this::config).start(7070);
-    app.get("/d/<deviceName>/effects", deviceHandler::getDeviceEffects);
-    app.get("/d/<deviceName>/palettes", deviceHandler::getDevicePalettes);
-    app.get("/d/<deviceName>/state", deviceHandler::getDeviceState);
-    app.post("/d/<deviceName>/state", deviceHandler::setDeviceState);
-    app.get("/d/<deviceName>/", this::getDeviceControlPanel);
-    app.get("/user/", userHandler::getUserProfile);
+    app.before("/d/<deviceName>/*", deviceHandler::beforeDevice);
+    app.get("/d/<deviceName>/effects", deviceHandler::getDeviceEffects, Role.AUTHENTICATED);
+    app.get("/d/<deviceName>/palettes", deviceHandler::getDevicePalettes, Role.AUTHENTICATED);
+    app.get("/d/<deviceName>/state", deviceHandler::getDeviceState, Role.AUTHENTICATED);
+    app.post("/d/<deviceName>/state", deviceHandler::setDeviceState, Role.AUTHENTICATED);
+    app.get("/d/<deviceName>/", this::getDeviceControlPanel, Role.AUTHENTICATED);
+    app.get("/user/", userHandler::getUserProfile, Role.USER);
   }
 
   private void getDeviceControlPanel(@NotNull Context ctx) {

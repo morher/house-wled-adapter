@@ -43,7 +43,9 @@ public class WledControllerImpl {
       Device device = deviceManager.device(deviceId);
 
       WledNode node = findOrCreateNode(lampConfig.getTopic());
-      WledLedStrip strip = new WledLedStrip(id, device, node, lampConfig.getSegment(), presets);
+      WledLedStrip strip =
+          new WledLedStrip(
+              id, device, node, lampConfig.getSegment(), lampConfig.getToken(), presets);
 
       strips.put(id, strip);
     }

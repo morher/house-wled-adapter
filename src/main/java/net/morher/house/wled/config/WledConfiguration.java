@@ -20,6 +20,7 @@ public class WledConfiguration {
     private DeviceName device;
     private String topic;
     private Integer segment;
+    private String token;
   }
 
   @Data
