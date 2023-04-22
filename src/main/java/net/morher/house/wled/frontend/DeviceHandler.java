@@ -7,7 +7,10 @@ import java.io.InputStream;
 import lombok.RequiredArgsConstructor;
 import net.morher.house.wled.WledControllerImpl;
 import net.morher.house.wled.WledLedStrip;
+import net.morher.house.wled.frontend.LedStripDataTO.LampStateTO;
+import net.morher.house.wled.frontend.LedStripDataTO.PresetTO;
 import net.morher.house.wled.frontend.auth.Tokens;
+import net.morher.house.wled.frontend.to.LedStyleTO;
 import net.morher.house.wled.style.LedStripState;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,9 +20,18 @@ public class DeviceHandler {
   private final WledControllerImpl controller;
 
   public void getDeviceState(@NotNull Context ctx) {
+    WledLedStrip device = DEVICE.get(ctx);
+    ctx.json(device.getState());
+  }
 
-    String stripId = ctx.pathParam("deviceName");
-    ctx.json(controller.getStrip(stripId).getState());
+  public void getDeviceData(@NotNull Context ctx) {
+    WledLedStrip device = DEVICE.get(ctx);
+    LedStripDataTO data = new LedStripDataTO();
+    data.setStyle(LedStyleTO.from(device.getState()));
+    device.getPresets().stream().map(p -> new PresetTO(p)).forEach(data.getPresets()::add);
+    data.setLamp(LampStateTO.from(device.getLampState()));
+
+    ctx.json(data);
   }
 
   public void beforeDevice(@NotNull Context ctx) {
@@ -38,6 +50,15 @@ public class DeviceHandler {
     String stripId = ctx.pathParam("deviceName");
     LedStripState state = ctx.bodyAsClass(LedStripState.class);
     controller.getStrip(stripId).setState(state);
+    ctx.result("Ok");
+  }
+
+  public void setLampState(@NotNull Context ctx) {
+    WledLedStrip device = DEVICE.get(ctx);
+    LampStateTO state = ctx.bodyAsClass(LampStateTO.class);
+
+    device.setLampState(state.asLightState());
+
     ctx.result("Ok");
   }
 

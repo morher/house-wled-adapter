@@ -23,7 +23,7 @@ public class LedStripDevice {
   private final ResourceManager resources = new ResourceManager();
   private final LightStateHandler lightHandler;
   private final EffectManager presets;
-  private LightState lightState = new LightState();
+  @Getter private LightState lightState = new LightState();
   @Getter private LedStripState state = new LedStripState();
   private final TopicValueHandler<LedStripStyle> customStyle;
   private final TopicValueHandler<String> lastPreset;
@@ -49,6 +49,11 @@ public class LedStripDevice {
 
     this.lightHandler = new LightStateHandler(lightEntity, this::onLightState);
     lightHandler.updateOptions(new LightOptions(true, presets.getEffectNames()));
+  }
+
+  public void setLightState(LightState state) {
+    onLightState(state);
+    lightHandler.updateState(state);
   }
 
   public void onLightState(LightState state) {

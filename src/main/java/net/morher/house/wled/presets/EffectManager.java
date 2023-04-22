@@ -33,7 +33,7 @@ public interface EffectManager {
 
   default List<String> getEffectNames() {
     ArrayList<String> effectNames = new ArrayList<>();
-    effectNames.add(defaultPreset());
+    //    effectNames.add(defaultPreset());
     effectNames.addAll(getLedStripPresets().stream().map(Preset::getName).collect(toList()));
     effectNames.add(getCustomEffect());
     effectNames.add(getLastPresetName());

@@ -29,7 +29,9 @@ public class WledFrontendServer {
   public void run() {
     Javalin app = Javalin.create(this::config).start(7070);
     app.before("/d/<deviceName>/*", deviceHandler::beforeDevice);
+    app.get("/d/<deviceName>/data", deviceHandler::getDeviceData, Role.AUTHENTICATED);
     app.get("/d/<deviceName>/effects", deviceHandler::getDeviceEffects, Role.AUTHENTICATED);
+    app.post("/d/<deviceName>/lamp", deviceHandler::setLampState, Role.AUTHENTICATED);
     app.get("/d/<deviceName>/palettes", deviceHandler::getDevicePalettes, Role.AUTHENTICATED);
     app.get("/d/<deviceName>/state", deviceHandler::getDeviceState, Role.AUTHENTICATED);
     app.post("/d/<deviceName>/state", deviceHandler::setDeviceState, Role.AUTHENTICATED);

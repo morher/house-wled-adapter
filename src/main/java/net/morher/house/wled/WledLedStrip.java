@@ -1,11 +1,14 @@
 package net.morher.house.wled;
 
+import static java.util.Collections.emptyList;
+import java.util.List;
 import lombok.Getter;
 import net.morher.house.api.devicetypes.LampDevice;
 import net.morher.house.api.entity.Device;
 import net.morher.house.api.entity.DeviceId;
 import net.morher.house.api.entity.DeviceInfo;
 import net.morher.house.api.entity.light.LightEntity;
+import net.morher.house.api.entity.light.LightState;
 import net.morher.house.api.utils.ResourceManager;
 import net.morher.house.wled.presets.EffectManager;
 import net.morher.house.wled.strip.LedStripDevice;
@@ -15,6 +18,7 @@ public class WledLedStrip {
   private final ResourceManager resources = new ResourceManager();
   @Getter private final String id;
   private final Device device;
+  private final LightEntity lightEntity;
   private final WledNode node;
   private final int segmentId;
   @Getter private final String token;
@@ -33,7 +37,7 @@ public class WledLedStrip {
     deviceInfo.setManufacturer("Wled");
     device.setDeviceInfo(deviceInfo);
 
-    LightEntity lightEntity = device.entity(LampDevice.LIGHT);
+    lightEntity = device.entity(LampDevice.LIGHT);
 
     this.stripDevice = new LedStripDevice(this::onLedStripStateUpdate, lightEntity, presets);
   }
@@ -50,7 +54,21 @@ public class WledLedStrip {
     return stripDevice.getState();
   }
 
+  public LightState getLampState() {
+    return stripDevice.getLightState();
+  }
+
   public void setState(LedStripState state) {
     stripDevice.updateCustomStyle(state);
+  }
+
+  public void setLampState(LightState state) {
+    stripDevice.setLightState(state);
+  }
+
+  public List<String> getPresets() {
+    return lightEntity.getOptions().getEffects() != null
+        ? lightEntity.getOptions().getEffects()
+        : emptyList();
   }
 }
