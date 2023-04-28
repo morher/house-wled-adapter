@@ -1,5 +1,6 @@
 package net.morher.house.wled;
 
+import static java.util.Objects.requireNonNullElse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,8 +14,10 @@ import net.morher.house.api.mqtt.payload.JsonMessage;
 import net.morher.house.api.schedule.HouseScheduler;
 import net.morher.house.wled.config.WledConfiguration;
 import net.morher.house.wled.config.WledConfiguration.WledLampConfig;
+import net.morher.house.wled.config.WledConfiguration.WledSegmentConfig;
 import net.morher.house.wled.presets.EffectManager;
 import net.morher.house.wled.presets.PresetManagerImpl;
+import net.morher.house.wled.strip.WledSegment;
 import net.morher.house.wled.to.WledNodeState;
 
 public class WledControllerImpl {
@@ -42,12 +45,27 @@ public class WledControllerImpl {
       DeviceId deviceId = lampConfig.getDevice().toDeviceId();
       Device device = deviceManager.device(deviceId);
 
-      WledNode node = findOrCreateNode(lampConfig.getTopic());
-      WledLedStrip strip =
-          new WledLedStrip(
-              id, device, node, lampConfig.getSegment(), lampConfig.getToken(), presets);
+      WledLedStrip strip = new WledLedStrip(id, device, lampConfig.getToken(), presets);
+
+      configureSegments(strip, lampConfig);
 
       strips.put(id, strip);
+    }
+  }
+
+  private void configureSegments(WledLedStrip strip, WledLampConfig config) {
+    String defaultTopic = config.getTopic();
+
+    if (config.getSegment() != null) {
+      WledNode node = findOrCreateNode(defaultTopic);
+      strip.getSegments().add(new WledSegment(node, config.getSegment(), null));
+    }
+
+    for (WledSegmentConfig segmentConfig : config.getSegments()) {
+      WledNode node = findOrCreateNode(requireNonNullElse(segmentConfig.getTopic(), defaultTopic));
+      strip
+          .getSegments()
+          .add(new WledSegment(node, segmentConfig.getSegment(), segmentConfig.getBrightness()));
     }
   }
 

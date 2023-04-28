@@ -1,6 +1,7 @@
 package net.morher.house.wled;
 
 import static java.util.Collections.emptyList;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import net.morher.house.api.devicetypes.LampDevice;
@@ -12,6 +13,7 @@ import net.morher.house.api.entity.light.LightState;
 import net.morher.house.api.utils.ResourceManager;
 import net.morher.house.wled.presets.EffectManager;
 import net.morher.house.wled.strip.LedStripDevice;
+import net.morher.house.wled.strip.WledSegment;
 import net.morher.house.wled.style.LedStripState;
 
 public class WledLedStrip {
@@ -19,18 +21,14 @@ public class WledLedStrip {
   @Getter private final String id;
   private final Device device;
   private final LightEntity lightEntity;
-  private final WledNode node;
-  private final int segmentId;
   @Getter private final String token;
   private final LedStripDevice stripDevice;
+  @Getter private final List<WledSegment> segments = new ArrayList<>();
 
-  public WledLedStrip(
-      String id, Device device, WledNode node, int segmentId, String token, EffectManager presets) {
+  public WledLedStrip(String id, Device device, String token, EffectManager presets) {
 
     this.id = id;
     this.device = device;
-    this.node = node;
-    this.segmentId = segmentId;
     this.token = token;
 
     DeviceInfo deviceInfo = new DeviceInfo();
@@ -43,7 +41,7 @@ public class WledLedStrip {
   }
 
   public void onLedStripStateUpdate(LedStripState state) {
-    node.updateSegment(segmentId, state);
+    segments.forEach(s -> s.updateState(state));
   }
 
   public DeviceId getDeviceId() {
