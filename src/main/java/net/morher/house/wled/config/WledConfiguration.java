@@ -19,7 +19,16 @@ public class WledConfiguration {
     private String id;
     private DeviceName device;
     private String topic;
+    private String token;
     private Integer segment;
+    private List<WledSegmentConfig> segments = new ArrayList<>();
+  }
+
+  @Data
+  public static class WledSegmentConfig {
+    private String topic;
+    private Integer segment;
+    private Double brightness;
   }
 
   @Data

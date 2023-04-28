@@ -24,21 +24,40 @@ public class SimpleUserManager implements UserManager {
 
   @Override
   public void manage(Handler handler, Context ctx, Set<RouteRole> routeRoles) throws Exception {
-    if (!ctx.basicAuthCredentialsExist()) {
-      ctx.status(401).header("WWW-Authenticate", "Basic realm=\"Access to staging site\"");
-      return;
+    String username = getUser(ctx);
+    UserManager.USERNAME.set(ctx, username);
+
+    if (routeRoles.contains(Role.ADMIN) || routeRoles.contains(Role.USER)) {
+      if (username == null) {
+        ctx.status(401).header("WWW-Authenticate", "Basic realm=\"Access to staging site\"");
+        return;
+      }
     }
 
+    if (routeRoles.contains(Role.AUTHENTICATED)) {
+      if (username == null && !Tokens.hasValidToken(ctx)) {
+        ctx.status(401).header("WWW-Authenticate", "Basic realm=\"Access to staging site\"");
+        return;
+      }
+    }
+
+    handler.handle(ctx);
+  }
+
+  @Override
+  public String getUser(Context ctx) throws InvalidAuthException {
+    if (!ctx.basicAuthCredentialsExist()) {
+      return null;
+    }
     String username = ctx.basicAuthCredentials().getUsername();
     String password = ctx.basicAuthCredentials().getPassword();
     User user = users.get(username);
 
     if (user == null || !user.checkPassword(username, password)) {
-      ctx.status(401).header("WWW-Authenticate", "Basic realm=\"Access to staging site\"");
-      return;
+      throw new InvalidAuthException();
     }
 
-    handler.handle(ctx);
+    return username;
   }
 
   private static String hashPassword(String username, String password) {

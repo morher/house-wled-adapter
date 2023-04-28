@@ -1,0 +1,176 @@
+* {
+	box-sizing: border-box;
+}
+
+:root {
+	margin: 0;
+	padding: 0;
+	font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
+		'Helvetica Neue', sans-serif;
+}
+
+body {
+	background-color: #111;
+	opacity: 1;
+	background-size: 10px 10px;
+	background-image: repeating-linear-gradient(45deg, #222222 0, #222222 1px, #111 0, #111
+		50%);
+	background-attachment: fixed;
+	color: #eee;
+	margin: 0;
+	padding: 0;
+}
+
+.led-control {
+	display: grid;
+	grid-template: 'header' 'main';
+	height: 100dvh;
+	overflow: auto;
+}
+
+header {
+	background: #080808;
+	grid-area: 'header';
+	display: grid;
+	grid-template: 'power brightness name';
+	grid-template-columns: auto auto 1fr;
+	gap: 1rem;
+}
+
+h1 {
+	font-size: 1.4rem;
+	font-family: inherit;
+	grid-area: name;
+	text-align: right;
+	padding: 0 1rem;
+}
+
+#power {
+	grid-area: power;
+}
+
+#brightness {
+	grid-area: brightness;
+}
+
+article {
+	display: grid;
+	grid-template-columns: 20rem 1fr 1fr;
+	overflow: auto;
+	scroll-snap-type: x mandatory;
+}
+
+@media ( max-width : 700px) {
+	article {
+		grid-template-columns: 100vw 100vw 100vw;
+		grid-template-columns: 100dvw 100dvw 100dvw;
+	}
+
+	header {
+		grid-template: 'power name' 'power brightness';
+		grid-template-columns: auto 1fr;
+		grid-template-rows: auto auto;
+		gap: .5rem;
+	}
+
+}
+
+section {
+	display: grid;
+	grid-template-rows: auto 1fr;
+	overflow: auto;
+	scroll-snap-align: start;
+}
+
+button {
+	position: relative;
+	height: 3rem;
+	border: none;
+	box-shadow: 0 0 0.5rem 0rem rgba(255, 255, 255, .2);
+	background: #11111180;
+	color: #fff;
+	font-weight: bold;
+	font-size: 1.0rem;
+	text-shadow: 1px 1px 1px rgb(0, 0, 0);
+}
+
+button.active {
+	background: #333;
+	/* text-shadow: 1px 1px 1px rgb(0 0 0); */
+	box-shadow: 0 0 1rem 0rem rgba(255, 255, 255, .5);
+}
+
+.optionlist {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+	gap: 1rem;
+}
+
+#colors, #animationOptions {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+	gap: 1rem;
+	padding: .5rem 1rem;
+}
+
+#colors>div, #animationOptions>div {
+	position: relative;
+}
+
+#colors label, #animationOptions label {
+	display: block;
+}
+
+#colors input[type=color] {
+	position: relative;
+	height: 3rem;
+	width: 100%;
+	border: 1px solid #000;
+	appearance: none;
+	background: #888;
+	box-shadow: inset -1rem -1rem 1rem #555;
+	padding: 2px;
+	border-radius: 5px;
+	overflow: hidden;
+}
+
+input[type="checkbox"] {
+	appearance: none;
+	background-color: #555;
+	margin: 1rem;
+	width: 3rem;
+	height: 3rem;
+	box-shadow: inset -1rem -1rem 1rem #333;
+	border-radius: 1.5rem;
+	display: grid;
+	place-content: center;
+}
+
+input[type="checkbox"]::before {
+	content: "";
+	width: 3rem;
+	height: 3rem;
+	border-radius: 1.5rem;
+	opacity: 0;
+	transition: 120ms opacity ease-in-out;
+	background: #f00;
+	box-shadow: inset -1rem -1rem 1rem #500;
+}
+
+input[type="checkbox"]:checked::before {
+	opacity: 1;
+}
+
+::-webkit-color-swatch-wrapper {
+	padding: 0;
+}
+
+::-webkit-color-swatch {
+	border: 0;
+	border-radius: 6px;
+}
+
+.scrollable {
+	overflow: auto;
+	padding: 1rem;
+}
